@@ -45,19 +45,23 @@ class PerceptronClassifier:
     # DO NOT ZERO OUT YOUR WEIGHTS BEFORE STARTING TRAINING, OR
     # THE AUTOGRADER WILL LIKELY DEDUCT POINTS.
     
+    # for label in self.legalLabels:
+    #   self.weights[label] = util.Counter()
+
     for iteration in range(self.max_iterations):
-      print "Starting iteration ", iteration, "..."
+      print ("Starting iteration ", iteration, "...")
       for i in range(len(trainingData)):
           "*** YOUR CODE HERE ***"
-          # correct= trainingLabels[i], self.classify([trainingData[i]])[0]
-          # prediction= trainingLabels[i], self.classify([trainingData[i]])[0]
-          # if correct != prediction:
-          #   self.weights[correct] = self.weights[correct] + trainingData[i]
-          #   self.weights[prediction] = self.weights[prediction] - trainingData[i]
+          accurate = trainingLabels[i]
+          guess = self.classify([trainingData[i]])[0]
+          if accurate != guess:
+            self.weights[accurate] = self.weights[accurate] + trainingData[i]
+            self.weights[guess] = self.weights[guess] - trainingData[i]
 
-          
+    return self.weights       
+        
 
-          util.raiseNotDefined()
+    #      util.raiseNotDefined()
     
   def classify(self, data ):
     """
@@ -75,14 +79,18 @@ class PerceptronClassifier:
     return guesses
 
   
-  def findHighWeightFeatures(self, label):
+  def findHighWeightFeatures(self, label): #need to change this method/rewrite part of it 
     """
     Returns a list of the 100 features with the greatest weight for some label
     """
     featuresWeights = []
+    weights = self.weights[label]
+    sorted_weights = sorted(weights.items(), keys=lamda x: x[1], reverse= True)
+    for i in range(min(100, len(sorted_weights))):
+      featuresWeights.append(sorted_weights[i][0])
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
 
     return featuresWeights
 
