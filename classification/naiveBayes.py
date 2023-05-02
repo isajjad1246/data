@@ -9,6 +9,7 @@
 import util
 import classificationMethod
 import math
+import collections
 
 class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
   """
@@ -29,6 +30,15 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     Do not modify this method.
     """
     self.k = k
+
+  ############
+  def check(self, out):
+    prob = dict(collections.Counter(out))
+    for k in prob.keys():
+      prob[k] = prob[k] / float(len(out))
+    return prob
+  ############
+
 
   def train(self, trainingData, trainingLabels, validationData, validationLabels):
     """
@@ -61,7 +71,41 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     """
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #computes prior probability for each class by counting number of occurrences of each label in training data + diving by total num of training samples
+    initial = dict(collections.Counter(trainingLabels))
+    for k in initial.keys():
+      initial[k] = initial[k]/float(len(trainingLabels)) #P(y) = c(y)/n
+    
+    sec = dict()
+
+    for x, prob in initial.items():
+      sec[x] = collections.defaultdict(list)
+
+    for x,prob in initial.items():
+      first = list()
+      for i, ptr in enumerate(trainingLabels):
+        if x == ptr:
+          first.append(i)
+      second = list()
+
+      for i in first:
+        second.append(trainingData[i])
+    
+      for y in range(len(second)):
+        for k, ptr in second[y].items():
+          sec[x][k].append(ptr)
+    
+    count = [a for a in initial]
+
+    for x in count:
+      for k, ptr in second[x].items():
+        sec[x][k] = self.check(sec[x][k]) #check method Laplace smooths
+    
+    self.initial = initial
+    self.count = count
+    self.sec = sec
+    
+   #util.raiseNotDefined()
         
   def classify(self, testData):
     """
@@ -89,7 +133,14 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     logJoint = util.Counter()
     
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    for x in self.count:
+      probs = self.initial[x]
+      for k, ptr in datum.items():
+        nf = self.sec[x][k]
+        probs = probs + math.log(nf.get(datum[k],.01))
+      logJoint[x] = probs
+
+    #util.raiseNotDefined()
     
     return logJoint
   
