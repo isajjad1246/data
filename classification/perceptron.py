@@ -58,6 +58,8 @@ class PerceptronClassifier:
             self.weights[accurate] = self.weights[accurate] + trainingData[i]
             self.weights[guess] = self.weights[guess] - trainingData[i]
 
+
+
     return self.weights       
         
 
@@ -79,13 +81,13 @@ class PerceptronClassifier:
     return guesses
 
   
-  def findHighWeightFeatures(self, label): #need to change this method/rewrite part of it 
+  def findHighWeightFeatures(self, label): 
     """
     Returns a list of the 100 features with the greatest weight for some label
     """
     featuresWeights = []
     w = self.weights[label] #weights
-    sorted_weights = sorted(w.items(), keys=lamda x: x[1], reverse= True)
+    sorted_weights = sorted(w.items(), keys=lambda x: x[1], reverse= True)
     # for i in range(min(100, len(sorted_weights))):
     #   featuresWeights.append(sorted_weights[i][0])
 
