@@ -116,12 +116,6 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   """
   # should be getting a randomized section of the data 
 
-<<<<<<< HEAD
-  trainingData = len(testData)
-  percentageArray = [10,20,30,40,50,60,70,80,90,100]
-  for i in range(10): #randomly shuffles in the percentage array 10 time to get a random percent
-    random.shuffle(percentageArray)
-=======
   # trainingData = len(testData)
   # percentageArray = [10,20,30,40,50,60,70,80,90,100]
   # for i in range(10): #randomly shuffles in the percentage array 10 time to get a random percent
@@ -131,7 +125,6 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
 
 
   # data_percentages = [int(trainingData *(p/100)) for p in percentageArray] #p-> percent variable 
->>>>>>> 73352aa719a2f076e84a2c950fb3b173b900ede9
   # print ("data_percentages: " % data_percentages)
   # random_perc = random.choice(percentage)
 
