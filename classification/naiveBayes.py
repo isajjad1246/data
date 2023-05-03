@@ -20,6 +20,9 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
   """
   def __init__(self, legalLabels):
     self.legalLabels = legalLabels
+    # self.intial = None
+    # self.count = None # Total count
+    # self.sec = None
     self.type = "naivebayes"
     self.k = 1 # this is the smoothing parameter, ** use it in your train method **
     self.automaticTuning = False # Look at this flag to decide whether to choose k automatically ** use this in your train method **
@@ -30,15 +33,6 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     Do not modify this method.
     """
     self.k = k
-
-  ############
-  def check(self, out):
-    prob = dict(collections.Counter(out))
-    for k in prob.keys():
-      prob[k] = prob[k] / float(len(out))
-    return prob
-  ############
-
 
   def train(self, trainingData, trainingLabels, validationData, validationLabels):
     """
@@ -56,6 +50,14 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
         
     self.trainAndTune(trainingData, trainingLabels, validationData, validationLabels, kgrid)
       
+  ############
+  #computes and returns dict w probability of each value (normalized with total vals in list)
+  def check(self, out):
+    prob = dict(collections.Counter(out))
+    for k in prob.keys():
+      prob[k] = prob[k] / float(len(out))
+    return prob
+  ############
   def trainAndTune(self, trainingData, trainingLabels, validationData, validationLabels, kgrid):
     """
     Trains the classifier by collecting counts over the training data, and
@@ -71,41 +73,40 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     """
 
     "*** YOUR CODE HERE ***"
-    #computes prior probability for each class by counting number of occurrences of each label in training data + diving by total num of training samples
-    initial = dict(collections.Counter(trainingLabels))
-    for k in initial.keys():
-      initial[k] = initial[k]/float(len(trainingLabels)) #P(y) = c(y)/n
-    
-    sec = dict()
+    self.labelCount = [0]*len(self.legalLabels)
+    self.featureCount = util.Counter()
 
-    for x, prob in initial.items():
-      sec[x] = collections.defaultdict(list)
+    #creates empty dicts for each label in featureCount
+    for x in self.legalLabels:
+      self.featureCount[x] = util.Counter()
+    
+    for i in range(len(trainingData)):
+      label = trainingLabels[i]
+      self.labelCount[label] += 1 #incrementing count of labels in training data
+      totalFeatures = trainingData[i]
+      for y in totalFeatures:
+        self.featureCount[label][y] += totalFeatures[y]  #counting 0s and 1s seen in feature y for label x
+      
+    self.totalTrainingData = len(trainingData)
+    
+    #use best k
+    bestAcc = None
+    #tempAcc = None
+    bestK = self.k
+    for k in kgrid or [0.0]:
+      self.k = k
+      classifiedRight = 0
+      guessCount = self.classify(trainingData)
+      for i, guess in enumerate(guessCount):
+        if trainingLabels[i] == guess:
+          classifiedRight += 1.0  #counts what is classified as right in the dataset to compare accuracies of k
+      tempAcc = classifiedRight/len(guessCount) #percentage of accurate guesses
 
-    for x,prob in initial.items():
-      first = list()
-      for i, ptr in enumerate(trainingLabels):
-        if x == ptr:
-          first.append(i)
-      second = list()
+      if bestAcc is None or bestAcc < tempAcc:
+        bestAcc = tempAcc
+        bestK = k
+    self.k = bestK
 
-      for i in first:
-        second.append(trainingData[i])
-    
-      for y in range(len(second)):
-        for k, ptr in second[y].items():
-          sec[x][k].append(ptr)
-    
-    count = [a for a in initial]
-
-    for x in count:
-      for k, ptr in second[x].items():
-        sec[x][k] = self.check(sec[x][k]) #check method Laplace smooths
-    
-    self.initial = initial
-    self.count = count
-    self.sec = sec
-    
-   #util.raiseNotDefined()
         
   def classify(self, testData):
     """
@@ -133,16 +134,24 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     logJoint = util.Counter()
     
     "*** YOUR CODE HERE ***"
-    for x in self.count:
-      probs = self.initial[x]
-      for k, ptr in datum.items():
-        nf = self.sec[x][k]
-        probs = probs + math.log(nf.get(datum[k],.01))
-      logJoint[x] = probs
+    self.priorProb = [1]*len(self.legalLabels)
+    for i in range(len(self.labelCount)): #i is label
+      if(self.labelCount[i] != 0):
+        self.priorProb[i] = math.log(self.labelCount[i]/float(self.totalTrainingData))
+        logJoint[i] = 1
 
-    #util.raiseNotDefined()
-    
-    return logJoint
+        for featureData in datum:  #prob of being greater than 0 in this label OR less that 0
+          if (datum[featureData] > 0):
+            logJoint[i] += math.log((self.featureCount[i][featureData] + self.k)/(float(self.labelCount[i]) + self.k))
+          else:
+            logJoint[i] += math.log(((self.labelCount[i] - self.featureCount[i][featureData]) + self.k)/(float(self.labelCount[i]) + self.k))
+
+        #stores prob into logJoint
+        logJoint[i] = self.priorProb[i] +logJoint[i]
+      else:
+        continue
+    return logJoint 
+
   
   def findHighOddsFeatures(self, label1, label2):
     """
