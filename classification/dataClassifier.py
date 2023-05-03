@@ -87,7 +87,7 @@ def enhancedFeatureExtractorFace(datum):
   It is your choice to modify this.
   """
   features =  basicFeatureExtractorFace(datum)
-  return features
+  return features    
 
 def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage):
   """
