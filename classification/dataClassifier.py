@@ -124,6 +124,12 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
           print (rawTestData[i])
           break
 
+  #######Experiments and Stats#######
+
+  for i in range(5):
+    for random 10%:
+      correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) #gets percentage correct
+
 
 ## =====================
 ## You don't have to modify any code below.
@@ -319,6 +325,13 @@ def runClassifier(args, options):
   validationData = map(featureFunction, rawValidationData)
   testData = map(featureFunction, rawTestData)
   
+  #THIS IS WHERE THE EXPERIMENTS AND PERCENTAGE STUFF GOES
+  for i in range(10):
+    dataPercent = len(trainingData) * (i/10)
+    for i in range(5):
+      
+
+
   # Conduct training and testing
   print ("Training...")
   classifier.train(trainingData, trainingLabels, validationData, validationLabels)
