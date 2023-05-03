@@ -50,14 +50,8 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
         
     self.trainAndTune(trainingData, trainingLabels, validationData, validationLabels, kgrid)
       
-  ############
-  #computes and returns dict w probability of each value (normalized with total vals in list)
-  def check(self, out):
-    prob = dict(collections.Counter(out))
-    for k in prob.keys():
-      prob[k] = prob[k] / float(len(out))
-    return prob
-  ############
+
+
   def trainAndTune(self, trainingData, trainingLabels, validationData, validationLabels, kgrid):
     """
     Trains the classifier by collecting counts over the training data, and
@@ -73,7 +67,7 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     """
 
     "*** YOUR CODE HERE ***"
-    self.labelCount = [0]*len(self.legalLabels)
+    self.labelCount = [0]*len(self.legalLabels) #array of 0s- to be filled in later
     self.featureCount = util.Counter()
 
     #creates empty dicts for each label in featureCount
@@ -81,12 +75,14 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
       self.featureCount[x] = util.Counter()
     
     for i in range(len(trainingData)):
+      totalFeatures = trainingData[i]
       label = trainingLabels[i]
       self.labelCount[label] += 1 #incrementing count of labels in training data
-      totalFeatures = trainingData[i]
+      #totalFeatures = trainingData[i]
       for y in totalFeatures:
         self.featureCount[label][y] += totalFeatures[y]  #counting 0s and 1s seen in feature y for label x
-      
+        #code above makes sure that count wont be 0 (leading to a probability of 0)- increases feature count by k so that it isnt 0
+        #and bayes probability wont be 0
     self.totalTrainingData = len(trainingData)
     
     #use best k
@@ -142,7 +138,7 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
 
         for featureData in datum:  #prob of being greater than 0 in this label OR less that 0
           if (datum[featureData] > 0):
-            logJoint[i] += math.log((self.featureCount[i][featureData] + self.k)/(float(self.labelCount[i]) + self.k))
+            logJoint[i] += math.log((self.featureCount[i][featureData] + self.k)/(float(self.labelCount[i]) + self.k)) #
           else:
             logJoint[i] += math.log(((self.labelCount[i] - self.featureCount[i][featureData]) + self.k)/(float(self.labelCount[i]) + self.k))
 
