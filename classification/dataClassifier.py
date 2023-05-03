@@ -16,13 +16,13 @@ import mira
 import samples
 import sys
 import util
-<<<<<<< HEAD
 import random
-=======
 import knn
->>>>>>> 65755fcb2a16e8e8c10833cc587723df14291817
+import time
+import matplotlib.pyplot as plt
+import numpy as np
 
-TEST_SET_SIZE = 100
+TEST_SET_SIZE =100
 DIGIT_DATUM_WIDTH=28
 DIGIT_DATUM_HEIGHT=28
 FACE_DATUM_WIDTH=60
@@ -116,10 +116,22 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   """
   # should be getting a randomized section of the data 
 
+<<<<<<< HEAD
   trainingData = len(testData)
   percentageArray = [10,20,30,40,50,60,70,80,90,100]
   for i in range(10): #randomly shuffles in the percentage array 10 time to get a random percent
     random.shuffle(percentageArray)
+=======
+  # trainingData = len(testData)
+  # percentageArray = [10,20,30,40,50,60,70,80,90,100]
+  # for i in range(10): #randomly shuffles in the percentage array 10 time to get a random percent
+  #   random.shuffle(percentageArray)
+
+  
+
+
+  # data_percentages = [int(trainingData *(p/100)) for p in percentageArray] #p-> percent variable 
+>>>>>>> 73352aa719a2f076e84a2c950fb3b173b900ede9
   # print ("data_percentages: " % data_percentages)
   # random_perc = random.choice(percentage)
 
@@ -156,7 +168,7 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
           print (rawTestData[i])
           break
 
-  # return data_list
+
 ## =====================
 ## You don't have to modify any code below.
 ## =====================
@@ -351,18 +363,109 @@ def runClassifier(args, options):
   validationData = map(featureFunction, rawValidationData)
   testData = map(featureFunction, rawTestData)
   
+#THIS IS WHERE THE EXPERIMENTS AND PERCENTAGE STUFF GOES
+  accuracyResults = [[0 for i in range(5)] for j in range(10)]
+  timeResults = [[0 for i in range(5)] for j in range(10)]
+
+  #sets them to 0 temporarily
+  validationLabels = [0]  
+  validationData = [0]
+
+  #print(len(trainingData))
+  #print(trainingData)
+
+  for percent in range(1,11):
+    print("Training with %f percent data", percent/float(10))
+    percentOfTrainingData = int(len(trainingData) * percent/float(10))
+    #print(len(trainingData))
+    for j in range(5):
+      rangeSet = list(range(len(trainingData))) #CHANGE
+      dataList = random.sample(rangeSet, percentOfTrainingData)
+      print(dataList)  #test print
+      tempTrainingData = [trainingData[x] for x in dataList]
+      tempTrainingLabels = [trainingLabels[x] for x in dataList]
+      #print(len(tempTrainingData))
+      #start time count
+      startTime = time.time()
+      classifier.train(tempTrainingData, tempTrainingLabels, validationData, validationLabels)
+      endTime = time.time()
+      #end time count
+
+      #do it on test data
+      print("Testing...")
+      guesses = classifier.classify(testData)
+      #from given code
+      correct = [guesses[y] == testLabels[y] for y in range(len(testLabels))].count(True)
+      print (str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels)))
+      analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+
+      #store the test percent correct into the arrays
+      tempAccuracyResult = 100.0*correct/(len(testLabels))
+      tempTimeResult = float(endTime - startTime)
+      accuracyResults[percent-1][j] = tempAccuracyResult
+      timeResults[percent-1][j] = tempTimeResult
+      #use dataPercent and choose random data points
+      #classifier.train(newData, trainingLabels, validationData, validationLabels)
+  
+  print("accuracy table: ", accuracyResults)
+  print("time table: ", timeResults)
+
+  #get the graphs
+  # avgAccuracy = [0 for i in range(5)]
+  # index = 0
+  # for i in range(10):
+  #   tempAvg = 0
+  #   for j in range(5):
+  #     tempAvg += accuracyResults[i][j]
+  #     print(tempAvg)
+  #   tempAvg = float(tempAvg/5)
+  #   avgAccuracy[index] = tempAvg
+  # print(avgAccuracy)
+
+  avgAccuracy = np.average(accuracyResults, axis=1)
+  #avgAccuracy = np.insert(avgAccuracy, 0, 0)
+  print("avg accuracy array:")
+  print(avgAccuracy)
+
+  avgTime = np.average(timeResults, axis=1)
+  #avgAccuracy = np.insert(avgAccuracy, 0, 0)
+  print("avg time array:")
+  print(avgTime)
+
+  stddevAccuracy = np.std(accuracyResults, axis=1)
+  stddevTime = np.std(timeResults, axis=1)
+  print("accuracy stddev: ", stddevAccuracy)
+  print("time stddev: ", stddevTime)
+  
+  # xpoints = np.array([0., 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
+  # ypoints = np.array(avgAccuracy)
+
+  # plt.plot(xpoints,ypoints)
+  # plt.figure()
+
+  # #for time
+  # avgTime = np.average(timeResults, axis=0)
+  # avgTime = np.insert(avgTime, 0, 0)
+  
+  # xpoints = np.array([0., 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
+  # ypoints = np.array(avgTime)
+
+  # plt.plot(xpoints,ypoints)
+  # plt.show()
+
+
   # Conduct training and testing
-  print ("Training...")
-  classifier.train(trainingData, trainingLabels, validationData, validationLabels)
-  print ("Validating...")
-  guesses = classifier.classify(validationData)
-  correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
-  print (str(correct), ("correct out of " + str(len(validationLabels)) + " (%.1f%%).") % (100.0 * correct / len(validationLabels)))
-  print ("Testing...")
-  guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True)
-  print (str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels)))
-  analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  # print ("Training...")
+  # classifier.train(trainingData, trainingLabels, validationData, validationLabels)
+  # print ("Validating...")
+  # guesses = classifier.classify(validationData)
+  # correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+  # print (str(correct), ("correct out of " + str(len(validationLabels)) + " (%.1f%%).") % (100.0 * correct / len(validationLabels)))
+  # print ("Testing...")
+  # guesses = classifier.classify(testData)
+  # correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True)
+  # print (str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels)))
+  # analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   
   # do odds ratio computation if specified at command line
   if((options.odds) & (options.classifier == "naiveBayes" or (options.classifier == "nb")) ):

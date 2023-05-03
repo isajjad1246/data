@@ -80,7 +80,7 @@ class KnnClassifier:
       featureDict.append(feature)
     testDict = []
     for i in range(self.size):
-      trainingDatum = list(np.append(featureDict[i], self.trainingLabels[i]))
+      trainingDatum = list(np.append(featureDict[i],None))
       testDict.append(trainingDatum)
     self.testDict = testDict
     
