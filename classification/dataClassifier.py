@@ -120,11 +120,6 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   percentageArray = [10,20,30,40,50,60,70,80,90,100]
   for i in range(10): #randomly shuffles in the percentage array 10 time to get a random percent
     random.shuffle(percentageArray)
-
-  
-
-
-  # data_percentages = [int(trainingData *(p/100)) for p in percentageArray] #p-> percent variable 
   # print ("data_percentages: " % data_percentages)
   # random_perc = random.choice(percentage)
 
