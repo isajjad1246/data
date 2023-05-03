@@ -16,7 +16,11 @@ import mira
 import samples
 import sys
 import util
+<<<<<<< HEAD
+import random
+=======
 import knn
+>>>>>>> 65755fcb2a16e8e8c10833cc587723df14291817
 
 TEST_SET_SIZE = 100
 DIGIT_DATUM_WIDTH=28
@@ -110,6 +114,39 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   This code won't be evaluated. It is for your own optional use
   (and you can modify the signature if you want).
   """
+  # should be getting a randomized section of the data 
+
+  trainingData = len(testData)
+  percentageArray = [10,20,30,40,50,60,70,80,90,100]
+  for i in range(10): #randomly shuffles in the percentage array 10 time to get a random percent
+    random.shuffle(percentageArray)
+
+  
+
+
+  # data_percentages = [int(trainingData *(p/100)) for p in percentageArray] #p-> percent variable 
+  # print ("data_percentages: " % data_percentages)
+  # random_perc = random.choice(percentage)
+
+
+  # data_list=[]
+
+  # initial_index=0
+  # for num_p in data_percentages:
+  #   sec = testData[initial_index:initial_index + num_p]
+  #   data_list.append(sec)
+  #   initial_index += num_p
+  
+  # last = testData[initial_index:]
+  # data_list.append(last)
+
+  # for i, sec in enumerate(data_list):
+  #   print("Section {} length: {}".format(i+1, len(sec)))
+
+
+
+  # for i in range(trainingData):
+
 
   # Put any code here...
   # Example of use:
@@ -123,12 +160,6 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
           print ("Image: ")
           print (rawTestData[i])
           break
-
-  #######Experiments and Stats#######
-
-  for i in range(5):
-    for random 10%:
-      correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) #gets percentage correct
 
 
 ## =====================
